@@ -25,6 +25,7 @@ import os
 # 6 = Monster's Inc
 # 7 = Jessie's Critters
 # 8 = Web Slingers
+# 9 = what other rides do you want?
 
 #Disneyland
 # 9 = Small World
