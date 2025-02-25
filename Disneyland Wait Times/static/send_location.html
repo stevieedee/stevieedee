@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Location</title>
+    <script>
+        function sendLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+
+                        fetch("[YOUR IP HERE]:5000/location", { // Your Flask server URL
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ latitude: latitude, longitude: longitude })
+                        })
+                        .then(response => {
+                            if (!response.ok) { // Check for HTTP errors (4xx or 5xx)
+                                return response.json().then(err => {throw new Error(err.error || 'Server Error')}); // Throw error with message
+                            }
+                            return response.json(); // If response is ok, parse the JSON
+                        })
+                        .then(data => {
+                            console.log("Server Response:", data);
+                            if (data.status === "inside Disneyland") {
+                                alert("You're at Disneyland!");
+                            } else if (data.status === "outside Disneyland") {
+                                alert("You're not at Disneyland.");
+                            } else if (data.error) { // Check for error messages from the server
+                                alert("Error: " + data.error);
+                            } else {
+                                alert("Unexpected response from server: " + JSON.stringify(data)); // Catch-all for unexpected data
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error with fetch request:", error);
+                            alert("Error: " + error.message); // Show error message to user
+                        });
+                    },
+                    error => {
+                        console.error("Geolocation error:", error);
+                        let message;
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                message = "User denied the request for Geolocation.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                message = "Location information is unavailable.";
+                                break;
+                            case error.TIMEOUT:
+                                message = "The request to get user location timed out.";
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                message = "An unknown error occurred.";
+                                break;
+                        }
+                        alert("Could not get location. " + message);
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Send Your Location</h2>
+    <button onclick="sendLocation()">Send Location</button>
+</body>
+</html>
