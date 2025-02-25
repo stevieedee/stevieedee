@@ -1,6 +1,6 @@
 - 👋 Hi, I’m @stevieedee
-- 👀 I’m interested in creating fun projects with python, ranging from data analysis to everyday household use.
 - 🌱 I’m currently learning python
+- I'm a technical product manager with 9 years of experience in the EV space.
 
 
 <!---
