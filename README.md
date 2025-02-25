@@ -1,6 +1,6 @@
 - 👋 Hi, I’m @stevieedee
-- 🌱 I’m currently learning python
-- I'm a technical product manager with 9 years of experience in the EV space.
+- Currently learning python
+- Technical product manager with 9 years of experience in the EV space.
 
 
 <!---
