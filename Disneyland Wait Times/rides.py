@@ -1,3 +1,4 @@
+#These are my kid's current favorite rides
 rides = {
     #Disneyland
     'Alice in Wonderland': 'https://www.thrill-data.com/waits/attraction/disneyland/aliceinwonderland/',

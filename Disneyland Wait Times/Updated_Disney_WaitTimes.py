@@ -10,21 +10,19 @@ import requests
 from rides import rides
 
 def send_email(ride_name, wait_time):
-    email_user = os.getenv('EMAIL_USER')
-    email_pass = os.getenv('EMAIL_PASS')
     msg = EmailMessage()
     msg['Subject'] = f'Low Wait Time Alert: {ride_name}'
-    msg['From'] = email_user
-    msg['To'] = email_user
-    
-    if wait_time == 'Closed':
-        msg.set_content(f'{ride_name} is Closed! Check back later.')
-    else:
-        msg.set_content(f'The wait time for {ride_name} is now {wait_time} minutes!')
-    
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-        smtp.login('useremailhere', 'passwordhere')
-        smtp.send_message(msg)
+    msg['From'] = 'your_email@example.com'
+    msg['To'] = 'recipient_email@example.com'
+    msg.set_content(f'The wait time for {ride_name} is now {wait_time} minutes!')
+
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp: #465 is for gmail
+            smtp.login('user@gmail.com', 'password')  # Use app password
+            smtp.send_message(msg)
+        print(f"Email successfully sent for {ride_name}!")
+    except Exception as e:
+        print(f"Error sending email: {e}")
 
 def get_ride_wait_time(url):
     with webdriver.Firefox() as browser:
@@ -33,7 +31,7 @@ def get_ride_wait_time(url):
         try:
             time.sleep(5) 
             wait_time_element = WebDriverWait(browser, 20).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "gauge-desc-box"))
+                EC.presence_of_element_located((By.CLASS_NAME, "gauge-desc-box")) #Website class that stores weait time
             )
             text = wait_time_element.text
         except Exception as e:
@@ -59,22 +57,27 @@ def monitor_rides():
                 elif isinstance(wait_time, int) and wait_time <= 20:
                     print(f'Alert: {ride} wait time is {wait_time} minutes!')
                     send_email(ride, wait_time)
-        time.sleep(600)
+        time.sleep(600) #Check again in 10 minutes
 
 def get_current_location():
     try:
-        response = requests.get("[YOUR IP HERE]:5000/location")
+        # Fetch the latest location from the Flask server
+        response = requests.get("[Your IP Address]:5000/location")
         data = response.json()
-        if "latitude" in data and "longitude" in data:
-            return float(data["latitude"]), float(data["longitude"])
+        
+        if 'latitude' in data and 'longitude' in data:
+            return float(data['latitude']), float(data['longitude'])
+        else:
+            print("Error: No location data available from the server.")
+            return None, None
     except requests.exceptions.RequestException as e:
         print("Error retrieving location from server:", e)
-    return None, None
+        return None, None
 
 def is_at_disneyland(latitude, longitude):
     try:
         response = requests.post(
-            "[YOUR IP HERE]/location",
+            "http://[Your IP Address]:5000/location",
             json={"latitude": latitude, "longitude": longitude}
         )
         data = response.json()

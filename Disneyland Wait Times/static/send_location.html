@@ -10,7 +10,7 @@
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
 
-                        fetch("[YOUR IP HERE]:5000/location", { // Your Flask server URL
+                        fetch("http://[YOUR IP ADDRESS]:5000/location", { // Your Flask server URL
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ latitude: latitude, longitude: longitude })

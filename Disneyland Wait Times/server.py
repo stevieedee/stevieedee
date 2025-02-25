@@ -3,10 +3,13 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/location": {"origins": "*"}})
+
+latest_location = None
 
 @app.route('/location', methods=['GET', 'POST'])
 def location():
+    global latest_location
     try:
         if request.method == 'POST':
             data = request.get_json()
@@ -27,13 +30,20 @@ def location():
 
             print(f"Received Location (POST) - Latitude: {latitude}, Longitude: {longitude}")
 
+            # Store the latest location
+            latest_location = {'latitude': latitude, 'longitude': longitude}
+
             if 33.80 <= latitude <= 33.82 and -117.92 <= longitude <= -117.90:
                 return jsonify({"status": "inside Disneyland"})
             else:
                 return jsonify({"status": "outside Disneyland"})
 
         elif request.method == 'GET':
-            return jsonify({'message': 'Send a POST request with latitude and longitude'}), 200
+            # Return the latest location data
+            if latest_location:
+                return jsonify(latest_location), 200
+            else:
+                return jsonify({'error': 'No location data available'}), 404
 
     except Exception as e:
         print(f"Error checking location: {e}")
